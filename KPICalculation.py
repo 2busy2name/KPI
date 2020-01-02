@@ -101,7 +101,7 @@ for fd in forecastDistance:
     perc1_kpi = []
     perc2_kpi = []
     f = open(fileNameCSV , "w+")
-    header = 'Average KPI      , Time , % Above Threshold \n'
+    header = 'Average KPI      ; Time ; % Above Threshold \n'
     f.write("%s" % header)
     ######################################################################
     for IndxSimu in range (0, NumSimu): #for IndxSimu in range (1, NumSimu)
@@ -217,7 +217,7 @@ for fd in forecastDistance:
         kpi_ind.append(Inst[0])
         perc1_kpi.append(percentual1)
         endt= strftime("%H:%M", Endtime[0].timetuple())
-        AA = str(kpisum) + ', ' + endt[-8:] + ', ' + str(percentual1) + ' \n'
+        AA = str(kpisum) + '; ' + endt[-8:] + '; ' + str(percentual1) + ' \n'
         f.write("%s" % AA)
         print("KPI values")
         print("==========")
