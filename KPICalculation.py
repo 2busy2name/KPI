@@ -54,9 +54,9 @@ ifsped = 0 #boolean: 0 not calculate KPIs for speed, 1 yes
 ######################################################################
 # Section KPI parameters
 #####################################################################
-forecastDistance=[10,15] #forecast distance in minutes 
+forecastDistance=[15] #forecast distance in minutes 
 thresholdSPED = 0.25 # for defining how many links have the KPIs under the treshold
-thresholdFlowList = [12,14] # for defining how many links have the KPI under the threshold
+thresholdFlowList = [12] # for defining how many links have the KPI under the threshold
 
 ######################################################################
 # Section Script parameters
@@ -64,6 +64,7 @@ thresholdFlowList = [12,14] # for defining how many links have the KPI under the
 ifDebug=0 # 0 = no Debug // 1 = only info about Network Elements exposed // 2 = full debug
 ifPlottingGraph = 1 # 0 = NO result plots // 1 = YES result plots
 ifCreateDedicatedFolder = 1 # 0 = NO dedicated folder are created // 1 = YES dedicated folder are created
+save_path = 'C:/Users/Giacomo.Cavalleri/Documents/GitHub/KPI_output' #select the folder you want to store the plots
 
 ######################################################################
 
@@ -81,7 +82,7 @@ for fd in forecastDistance:
     thresholdFLOW = thresholdFlowList[iter]
     ######################################################################
     if ifCreateDedicatedFolder == 0:
-        save_path_plot = 'C:/Users/Giacomo.Cavalleri/Documents/GitHub/KPI_output/' #select the folder you want to store the plots
+        save_path_plot = save_path
         print('No Dedicated Folder\n')
     else:   
         if ifflow > 0:
@@ -89,8 +90,7 @@ for fd in forecastDistance:
         else:
             whichKPI = 'KPI_Speed_t' + str(fd)
         
-        save_path = 'C:/Users/Giacomo.Cavalleri/Documents/GitHub/KPI_output' #select the folder you want to store the plots
-        save_path_plot = 'C:/Users/Giacomo.Cavalleri/Documents/GitHub/KPI_output/' + whichKPI + '/' #select the folder you want to store the plots
+        save_path_plot = save_path + whichKPI + '/' #select the folder you want to store the plots
         os.mkdir(save_path_plot)
         print('Dedicated Folder Created \n')
     fileNameCSV = save_path_plot + 'kpi_values.csv' #select the filename of CSV file
