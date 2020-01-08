@@ -21,11 +21,11 @@ print("")
 
 #######################################################################DATABASE SECTION
 
-postgres_server = 'localhost'
-postgres_port = 5432
-postgres_user = 'postgres'
-postgres_password = 'postgres'
-postgres_db = 'otpima_socrates'
+#postgres_server = 'localhost'
+#postgres_port = 5432
+#postgres_user = 'postgres'
+#postgres_password = 'postgres'
+#postgres_db = 'otpima_socrates'
 
 ######################################################################
 
@@ -46,25 +46,25 @@ print("Connection to OPTIMA database established \n")
 # Section TRE parameters
 #####################################################################
 NumSimuIni=63394 #first 'simu' which the script starts from
-NumSimu=90 #Number of simulations that script must iterate
+NumSimu=2 #79 #Number of simulations that script must iterate
 delta=5 #delta (width of TRE simulation interval)
-ifflow = 1 #boolean: 0 not calculate KPIs for flow, 1 yes
-ifsped = 0 #boolean: 0 not calculate KPIs for speed, 1 yes
+ifflow = 0 #boolean: 0 not calculate KPIs for flow, 1 yes
+ifsped = 1 #boolean: 0 not calculate KPIs for speed, 1 yes
 
 ######################################################################
 # Section KPI parameters
 #####################################################################
-forecastDistance=[15] #forecast distance in minutes 
-thresholdSPED = 0.25 # for defining how many links have the KPIs under the treshold
+forecastDistance=[10, 15] #forecast distance in minutes 
+thresholdSpeedList = [0.25, 0.25] # for defining how many links have the KPIs under the treshold
 thresholdFlowList = [12] # for defining how many links have the KPI under the threshold
 
 ######################################################################
 # Section Script parameters
 #####################################################################
 ifDebug=0 # 0 = no Debug // 1 = only info about Network Elements exposed // 2 = full debug
-ifPlottingGraph = 1 # 0 = NO result plots // 1 = YES result plots
+ifPlottingGraph = 0 # 0 = NO result plots // 1 = YES result plots
 ifCreateDedicatedFolder = 1 # 0 = NO dedicated folder are created // 1 = YES dedicated folder are created
-save_path = 'C:/Users/Giacomo.Cavalleri/Documents/GitHub/KPI_output' #select the folder you want to store the plots
+save_path = 'C:/Users/Giacomo.Cavalleri/Documents/GitHub/KPI_output/' #select the folder you want to store the plots
 
 ######################################################################
 
@@ -79,7 +79,7 @@ elif ifDebug > 2:
 iter=0
 
 for fd in forecastDistance:
-    thresholdFLOW = thresholdFlowList[iter]
+    
     ######################################################################
     if ifCreateDedicatedFolder == 0:
         save_path_plot = save_path
@@ -117,6 +117,7 @@ for fd in forecastDistance:
         Endtime = []
 
         if ifsped > 0:
+            thresholdSPED = thresholdSpeedList[iter]
 
             query = """select out1.strt,out1.fsnd,out1.tsped,out1.rsped, out2.inst, out2.run_start_inst from ( Select t.strt,t.fsnd,t.sped as tsped,r.sped as rsped,r.simu,r.endtime,t.ldat from tsta t join rlin_tsys_tre r on (r.link, r.fnod) = (t.strt, t.fsnd) where t.tsys is null AND r.simu=%s AND t.ldat =  r.endtime and t.sped > 0) as out1 join (select s.idno,s.run_start_inst,s.simulated_from,s.simulated_to, substring(cast(s.inst as varchar),9,4) as inst from simu as s )as out2 on (out1.simu)=(out2.idno) where out2.run_start_inst > out1.endtime - '%s min'::interval and out2.run_start_inst<=out1.endtime-'%s min'::interval+'%s min'::interval""" % (Simu, fd, fd, delta)
 
@@ -126,6 +127,8 @@ for fd in forecastDistance:
         else:
             fakeelse = 1
         if ifflow > 0:
+            thresholdFLOW = thresholdFlowList[iter]
+
             query = """select out1.strt,out1.fsnd,out1.tflow,out1.rflow, out2.inst, out2.run_start_inst  from ( Select t.strt,t.fsnd,t.flow as tflow,r.oflw as rflow,r.simu,r.endtime,t.ldat from tsta t join rlin_tsys_tre r on (r.link, r.fnod) = (t.strt, t.fsnd) where t.tsys is null AND r.simu=%s AND t.ldat =  r.endtime and t.flow > 0) as out1 join (select s.idno,s.run_start_inst,s.simulated_from,s.simulated_to, substring(cast(s.inst as varchar),9,4) as inst from simu as s )as out2 on (out1.simu)=(out2.idno) where out2.run_start_inst > out1.endtime - '%s min'::interval and out2.run_start_inst<=out1.endtime-'%s min'::interval+'%s min'::interval""" % (Simu, fd, fd, delta)
 
             #"""select out1.strt,out1.fsnd,out1.tflow,out1.rflow,concat(extract(hour from out2.insta),extract(minute from out2.insta)) from ( Select t.strt,t.fsnd,t.flow as tflow,r.oflw as rflow,r.simu,r.inst,r.fore,r.starttime,r.endtime,t.cdat,t.fdat,t.ldat from tsta t join rlin_tsys_tre r on (r.link, r.fnod) = (t.strt, t.fsnd) where r.link=5839829 and r.fnod=2000006632 and t.tsys is null and t.flow is not null and t.fdat =  r.starttime + '10 min'::interval AND r.simu=%s AND t.ldat =  r.endtime and t.sped > 0 order by t.strt) as out1 join (select s.idno,s.run_start_inst as insta,s.simulated_from,s.simulated_to from simu as s ) as out2 on (out1.simu)=(out2.idno) where out2.simulated_from = out1.fdat-'%s min'::interval""" % (Simu, shiftRlin)
