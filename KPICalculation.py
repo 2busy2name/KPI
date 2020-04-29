@@ -23,8 +23,8 @@ print("")
 
 #postgres_server = 'localhost'
 #postgres_port = 5432
-#postgres_user = 'postgres'
-#postgres_password = 'postgres'
+#postgres_user = '++++'
+#postgres_password = '++++'
 #postgres_db = 'otpima_socrates'
 
 ######################################################################
